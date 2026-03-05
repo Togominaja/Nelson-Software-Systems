@@ -58,3 +58,132 @@ inPageLinks.forEach((link) => {
     }, 1300);
   });
 });
+
+const FUNCTION_BASE = "/.netlify/functions";
+
+function setFormStatus(formNode, message, state) {
+  const statusNode = formNode.querySelector(".js-form-status");
+  if (!statusNode) {
+    return;
+  }
+
+  statusNode.textContent = message;
+  if (state) {
+    statusNode.dataset.state = state;
+  } else {
+    delete statusNode.dataset.state;
+  }
+}
+
+function getFieldValue(formNode, fieldName) {
+  const field = formNode.elements.namedItem(fieldName);
+  if (!field || typeof field.value !== "string") {
+    return "";
+  }
+
+  return field.value.trim();
+}
+
+function readFormData(formNode) {
+  return {
+    name: getFieldValue(formNode, "name"),
+    email: getFieldValue(formNode, "email"),
+    phone: getFieldValue(formNode, "phone"),
+    company: getFieldValue(formNode, "company"),
+    message: getFieldValue(formNode, "message"),
+    website: getFieldValue(formNode, "website"),
+    page: window.location.pathname,
+  };
+}
+
+const leadForms = document.querySelectorAll(".js-lead-form");
+leadForms.forEach((formNode) => {
+  formNode.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitBtn = formNode.querySelector('button[type="submit"]');
+    const leadData = readFormData(formNode);
+
+    if (!leadData.name || !leadData.email || !leadData.message) {
+      setFormStatus(formNode, "Please fill in name, email, and project details.", "error");
+      return;
+    }
+
+    try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      setFormStatus(formNode, "Sending...", "");
+
+      const response = await fetch(`${FUNCTION_BASE}/submit-lead`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(leadData),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "Unable to submit form");
+      }
+
+      formNode.reset();
+      setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
+    } catch (error) {
+      setFormStatus(
+        formNode,
+        "Could not submit right now. Please email me at sbravatti.nelson@gmail.com.",
+        "error"
+      );
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+    }
+  });
+});
+
+function getSessionId() {
+  const key = "nss_session_id";
+  try {
+    const existing = window.localStorage.getItem(key);
+    if (existing) {
+      return existing;
+    }
+
+    const next =
+      window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    window.localStorage.setItem(key, next);
+    return next;
+  } catch {
+    return "";
+  }
+}
+
+async function trackPageView() {
+  try {
+    const pageViewKey = `nss_pageview_${window.location.pathname}`;
+    if (window.sessionStorage.getItem(pageViewKey)) {
+      return;
+    }
+    window.sessionStorage.setItem(pageViewKey, "1");
+
+    await fetch(`${FUNCTION_BASE}/track-pageview`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        path: window.location.pathname,
+        referrer: document.referrer || "",
+        sessionId: getSessionId(),
+      }),
+    });
+  } catch {
+    // Intentionally ignored to avoid impacting the user experience.
+  }
+}
+
+trackPageView();

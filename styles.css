@@ -400,6 +400,93 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.lead-form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.lead-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.34rem;
+  color: #d0ddfb;
+  font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(8, 13, 26, 0.78);
+  color: var(--text);
+  font: inherit;
+  padding: 0.62rem 0.72rem;
+}
+
+.form-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.hp-field {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lead-form button[disabled] {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-status {
+  margin: 0;
+  min-height: 1.2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.form-status[data-state="success"] {
+  color: #8cf7bc;
+}
+
+.form-status[data-state="error"] {
+  color: #ff9bb0;
+}
+
+.contact-alt {
+  margin: 0.35rem 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .contact-links {
   display: flex;
   flex-wrap: wrap;
@@ -459,6 +546,10 @@ h1 {
 
   .about-photo-wrap {
     max-width: 220px;
+  }
+
+  .lead-grid {
+    grid-template-columns: 1fr;
   }
 
   .service-list {

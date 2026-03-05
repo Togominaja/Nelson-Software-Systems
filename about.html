@@ -152,6 +152,50 @@
           Share what your team is trying to improve, and I’ll recommend a
           practical first step.
         </p>
+        <form class="lead-form js-lead-form" novalidate>
+          <div class="lead-grid">
+            <label class="form-field">
+              <span>Name</span>
+              <input type="text" name="name" autocomplete="name" required />
+            </label>
+            <label class="form-field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label class="form-field">
+              <span>Phone (optional)</span>
+              <input type="tel" name="phone" autocomplete="tel" />
+            </label>
+            <label class="form-field">
+              <span>Company (optional)</span>
+              <input type="text" name="company" autocomplete="organization" />
+            </label>
+          </div>
+          <label class="form-field">
+            <span>Project details</span>
+            <textarea
+              name="message"
+              rows="5"
+              placeholder="What problem are you trying to solve?"
+              required
+            ></textarea>
+          </label>
+          <input
+            class="hp-field"
+            type="text"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+          <div class="contact-actions">
+            <button class="btn btn-primary" type="submit">
+              Send project request
+            </button>
+            <p class="form-status js-form-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="contact-alt">Prefer direct contact?</p>
         <div class="contact-links">
           <a
             class="btn btn-primary"
