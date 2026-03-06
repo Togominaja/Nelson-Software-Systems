@@ -496,6 +496,10 @@ h1 {
   color: #ff9bb0;
 }
 
+.form-status[data-state="warning"] {
+  color: #ffd27d;
+}
+
 .form-consent {
   margin: 0;
   color: #9ab0de;

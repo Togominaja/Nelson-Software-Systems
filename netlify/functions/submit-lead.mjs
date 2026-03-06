@@ -1,4 +1,5 @@
 import { neon } from "@netlify/neon";
+import nodemailer from "nodemailer";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -18,6 +19,64 @@ function cleanText(value, maxLength) {
   }
 
   return value.trim().slice(0, maxLength);
+}
+
+function envValue(name, fallback = "") {
+  const value = process.env[name];
+  return typeof value === "string" && value.length > 0 ? value : fallback;
+}
+
+async function sendLeadNotification({ name, email, phone, company, message, page }) {
+  const smtpUser = envValue("SMTP_USER");
+  const smtpPass = envValue("SMTP_PASS");
+  if (!smtpUser || !smtpPass) {
+    return { emailSent: false, emailError: "email_not_configured" };
+  }
+
+  const smtpHost = envValue("SMTP_HOST", "smtp.gmail.com");
+  const smtpPort = Number(envValue("SMTP_PORT", "465"));
+  const smtpSecure = envValue("SMTP_SECURE", smtpPort === 465 ? "true" : "false") !== "false";
+  const notifyTo = envValue("NOTIFY_TO", smtpUser);
+  const notifyFrom = envValue("NOTIFY_FROM", smtpUser);
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+
+  const subject = `New website lead: ${name}`;
+  const text = [
+    "New lead submitted from your website.",
+    "",
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Phone: ${phone}`,
+    `Company: ${company || "-"}`,
+    `Page: ${page || "-"}`,
+    `Submitted: ${new Date().toISOString()}`,
+    "",
+    "Message:",
+    message,
+  ].join("\n");
+
+  try {
+    await transporter.sendMail({
+      to: notifyTo,
+      from: notifyFrom,
+      replyTo: email,
+      subject,
+      text,
+    });
+    return { emailSent: true };
+  } catch (error) {
+    console.error("lead email send error", error);
+    return { emailSent: false, emailError: "email_send_failed" };
+  }
 }
 
 export default async (request) => {
@@ -87,7 +146,16 @@ export default async (request) => {
       )
     `;
 
-    return jsonResponse({ ok: true });
+    const emailStatus = await sendLeadNotification({
+      name,
+      email,
+      phone,
+      company,
+      message,
+      page,
+    });
+
+    return jsonResponse({ ok: true, ...emailStatus });
   } catch (error) {
     console.error("submit-lead error", error);
     return jsonResponse({ ok: false, error: "Unable to save lead" }, 500);

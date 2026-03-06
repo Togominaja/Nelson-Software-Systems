@@ -60,7 +60,6 @@ inPageLinks.forEach((link) => {
 });
 
 const FUNCTION_BASE = "/.netlify/functions";
-const IS_LOCAL_PREVIEW = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
 function setFormStatus(formNode, message, state) {
   const statusNode = formNode.querySelector(".js-form-status");
@@ -118,37 +117,7 @@ async function submitLeadToDatabase(leadData) {
   if (!response.ok || !payload.ok) {
     throw new Error(payload.error || "Unable to submit lead to database");
   }
-}
-
-async function submitLeadToNetlifyForm(formNode, leadData) {
-  if (IS_LOCAL_PREVIEW) {
-    return;
-  }
-
-  const formName = formNode.getAttribute("name") || "project-request";
-  const encoded = new URLSearchParams({
-    "form-name": formName,
-    name: leadData.name,
-    email: leadData.email,
-    phone: leadData.phone,
-    company: leadData.company,
-    message: leadData.message,
-    website: leadData.website,
-    page: leadData.page,
-    consent: leadData.consent ? "yes" : "no",
-  }).toString();
-
-  const response = await fetch("/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: encoded,
-  });
-
-  if (!response.ok) {
-    throw new Error("Unable to submit Netlify form");
-  }
+  return payload;
 }
 
 leadForms.forEach((formNode) => {
@@ -178,35 +147,17 @@ leadForms.forEach((formNode) => {
       }
       setFormStatus(formNode, "Sending...", "");
 
-      const [emailResult, dbResult] = await Promise.allSettled([
-        submitLeadToNetlifyForm(formNode, leadData),
-        submitLeadToDatabase(leadData),
-      ]);
-
-      const emailOk = emailResult.status === "fulfilled";
-      const dbOk = dbResult.status === "fulfilled";
-
-      if (!emailOk && !dbOk) {
-        throw new Error("Could not submit lead");
-      }
-
-      if (!emailOk) {
-        console.warn("Lead saved, but Netlify email notification failed", emailResult.reason);
-      }
-
-      if (!dbOk) {
-        console.warn("Lead email sent, but DB save failed", dbResult.reason);
-      }
+      const submitResult = await submitLeadToDatabase(leadData);
 
       formNode.reset();
-      if (emailOk) {
-        setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
-      } else {
+      if (submitResult.emailSent === false) {
         setFormStatus(
           formNode,
-          "Request received. Email notification is not fully configured yet, but your message was saved.",
-          "success"
+          "Request received and saved. Email notification is not configured yet.",
+          "warning"
         );
+      } else {
+        setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
       }
     } catch (error) {
       setFormStatus(
