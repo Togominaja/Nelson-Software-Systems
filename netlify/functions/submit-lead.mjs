@@ -43,7 +43,7 @@ export default async (request) => {
   const message = cleanText(payload?.message, 4000);
   const page = cleanText(payload?.page, 255);
 
-  if (!name || !email || !message) {
+  if (!name || !email || !phone || !message) {
     return jsonResponse({ ok: false, error: "Missing required fields" }, 400);
   }
 

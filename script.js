@@ -103,8 +103,12 @@ leadForms.forEach((formNode) => {
     const submitBtn = formNode.querySelector('button[type="submit"]');
     const leadData = readFormData(formNode);
 
-    if (!leadData.name || !leadData.email || !leadData.message) {
-      setFormStatus(formNode, "Please fill in name, email, and project details.", "error");
+    if (!leadData.name || !leadData.email || !leadData.phone || !leadData.message) {
+      setFormStatus(
+        formNode,
+        "Please fill in name, email, phone, and project details.",
+        "error"
+      );
       return;
     }
 
