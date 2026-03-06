@@ -42,8 +42,9 @@ export default async (request) => {
   const company = cleanText(payload?.company, 160);
   const message = cleanText(payload?.message, 4000);
   const page = cleanText(payload?.page, 255);
+  const consent = payload?.consent === true;
 
-  if (!name || !email || !phone || !message) {
+  if (!name || !email || !phone || !message || !consent) {
     return jsonResponse({ ok: false, error: "Missing required fields" }, 400);
   }
 
@@ -59,22 +60,29 @@ export default async (request) => {
         id BIGSERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
-        phone TEXT,
+        phone TEXT NOT NULL,
         company TEXT,
         message TEXT NOT NULL,
+        consent BOOLEAN NOT NULL DEFAULT false,
         page TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
 
     await sql`
-      INSERT INTO leads (name, email, phone, company, message, page)
+      ALTER TABLE leads
+      ADD COLUMN IF NOT EXISTS consent BOOLEAN NOT NULL DEFAULT false
+    `;
+
+    await sql`
+      INSERT INTO leads (name, email, phone, company, message, consent, page)
       VALUES (
         ${name},
         ${email},
-        ${phone || null},
+        ${phone},
         ${company || null},
         ${message},
+        ${consent},
         ${page || null}
       )
     `;

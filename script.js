@@ -84,6 +84,11 @@ function getFieldValue(formNode, fieldName) {
   return field.value.trim();
 }
 
+function getCheckboxChecked(formNode, fieldName) {
+  const field = formNode.elements.namedItem(fieldName);
+  return Boolean(field && field.checked === true);
+}
+
 function readFormData(formNode) {
   return {
     name: getFieldValue(formNode, "name"),
@@ -92,6 +97,7 @@ function readFormData(formNode) {
     company: getFieldValue(formNode, "company"),
     message: getFieldValue(formNode, "message"),
     website: getFieldValue(formNode, "website"),
+    consent: getCheckboxChecked(formNode, "consent"),
     page: window.location.pathname,
   };
 }
@@ -103,10 +109,16 @@ leadForms.forEach((formNode) => {
     const submitBtn = formNode.querySelector('button[type="submit"]');
     const leadData = readFormData(formNode);
 
-    if (!leadData.name || !leadData.email || !leadData.phone || !leadData.message) {
+    if (
+      !leadData.name ||
+      !leadData.email ||
+      !leadData.phone ||
+      !leadData.message ||
+      !leadData.consent
+    ) {
       setFormStatus(
         formNode,
-        "Please fill in name, email, phone, and project details.",
+        "Please fill in all required fields and accept the consent checkbox.",
         "error"
       );
       return;
