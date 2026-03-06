@@ -152,7 +152,16 @@
           Share what your team is trying to improve, and I’ll recommend a
           practical first step.
         </p>
-        <form class="lead-form js-lead-form" novalidate>
+        <form
+          class="lead-form js-lead-form"
+          name="project-request"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="website"
+          novalidate
+        >
+          <input type="hidden" name="form-name" value="project-request" />
+          <input type="hidden" name="page" value="/about.html" />
           <div class="lead-grid">
             <label class="form-field">
               <span>Name</span>

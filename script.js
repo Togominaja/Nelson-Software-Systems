@@ -60,6 +60,7 @@ inPageLinks.forEach((link) => {
 });
 
 const FUNCTION_BASE = "/.netlify/functions";
+const IS_LOCAL_PREVIEW = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
 function setFormStatus(formNode, message, state) {
   const statusNode = formNode.querySelector(".js-form-status");
@@ -103,6 +104,53 @@ function readFormData(formNode) {
 }
 
 const leadForms = document.querySelectorAll(".js-lead-form");
+
+async function submitLeadToDatabase(leadData) {
+  const response = await fetch(`${FUNCTION_BASE}/submit-lead`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(leadData),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.ok) {
+    throw new Error(payload.error || "Unable to submit lead to database");
+  }
+}
+
+async function submitLeadToNetlifyForm(formNode, leadData) {
+  if (IS_LOCAL_PREVIEW) {
+    return;
+  }
+
+  const formName = formNode.getAttribute("name") || "project-request";
+  const encoded = new URLSearchParams({
+    "form-name": formName,
+    name: leadData.name,
+    email: leadData.email,
+    phone: leadData.phone,
+    company: leadData.company,
+    message: leadData.message,
+    website: leadData.website,
+    page: leadData.page,
+    consent: leadData.consent ? "yes" : "no",
+  }).toString();
+
+  const response = await fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: encoded,
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to submit Netlify form");
+  }
+}
+
 leadForms.forEach((formNode) => {
   formNode.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -130,17 +178,17 @@ leadForms.forEach((formNode) => {
       }
       setFormStatus(formNode, "Sending...", "");
 
-      const response = await fetch(`${FUNCTION_BASE}/submit-lead`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(leadData),
-      });
+      const [emailResult, dbResult] = await Promise.allSettled([
+        submitLeadToNetlifyForm(formNode, leadData),
+        submitLeadToDatabase(leadData),
+      ]);
 
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.error || "Unable to submit form");
+      if (emailResult.status !== "fulfilled") {
+        throw new Error("Could not send lead email");
+      }
+
+      if (dbResult.status !== "fulfilled") {
+        console.warn("Lead email sent but DB save failed", dbResult.reason);
       }
 
       formNode.reset();
