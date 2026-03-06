@@ -183,16 +183,31 @@ leadForms.forEach((formNode) => {
         submitLeadToDatabase(leadData),
       ]);
 
-      if (emailResult.status !== "fulfilled") {
-        throw new Error("Could not send lead email");
+      const emailOk = emailResult.status === "fulfilled";
+      const dbOk = dbResult.status === "fulfilled";
+
+      if (!emailOk && !dbOk) {
+        throw new Error("Could not submit lead");
       }
 
-      if (dbResult.status !== "fulfilled") {
-        console.warn("Lead email sent but DB save failed", dbResult.reason);
+      if (!emailOk) {
+        console.warn("Lead saved, but Netlify email notification failed", emailResult.reason);
+      }
+
+      if (!dbOk) {
+        console.warn("Lead email sent, but DB save failed", dbResult.reason);
       }
 
       formNode.reset();
-      setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
+      if (emailOk) {
+        setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
+      } else {
+        setFormStatus(
+          formNode,
+          "Request received. Email notification is not fully configured yet, but your message was saved.",
+          "success"
+        );
+      }
     } catch (error) {
       setFormStatus(
         formNode,
