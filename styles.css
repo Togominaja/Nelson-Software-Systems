@@ -338,6 +338,23 @@ h1 {
   box-shadow: 0 10px 20px rgba(20, 35, 74, 0.28);
 }
 
+.btn-whatsapp {
+  color: #f6fffa;
+  background: linear-gradient(135deg, #1fbf73 0%, #12a55f 100%);
+  box-shadow: 0 10px 24px rgba(18, 165, 95, 0.28);
+}
+
+.btn-whatsapp:hover {
+  box-shadow: 0 12px 28px rgba(18, 165, 95, 0.36);
+}
+
+.whatsapp-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.42rem;
+  flex: 0 0 auto;
+}
+
 .panel {
   background: linear-gradient(160deg, var(--surface) 0%, var(--surface-strong) 100%);
   border: 1px solid var(--line);
