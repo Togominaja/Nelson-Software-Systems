@@ -168,6 +168,13 @@ main,
   border-radius: 999px;
 }
 
+.lang-switch .lang-flag {
+  display: inline-block;
+  margin-right: 0.26rem;
+  font-size: 0.95em;
+  line-height: 1;
+}
+
 .lang-switch a:hover {
   color: #d8e7ff;
 }
