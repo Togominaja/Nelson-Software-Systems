@@ -75,6 +75,16 @@ function setFormStatus(formNode, message, state) {
   }
 }
 
+function getFormMessage(formNode, key, fallback) {
+  const value = formNode.getAttribute(`data-msg-${key}`);
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const cleanValue = value.trim();
+  return cleanValue.length > 0 ? cleanValue : fallback;
+}
+
 function getFieldValue(formNode, fieldName) {
   const field = formNode.elements.namedItem(fieldName);
   if (!field || typeof field.value !== "string") {
@@ -125,6 +135,27 @@ leadForms.forEach((formNode) => {
     event.preventDefault();
     const submitBtn = formNode.querySelector('button[type="submit"]');
     const leadData = readFormData(formNode);
+    const missingMessage = getFormMessage(
+      formNode,
+      "missing",
+      "Please fill in all required fields and accept the consent checkbox."
+    );
+    const sendingMessage = getFormMessage(formNode, "sending", "Sending...");
+    const warningMessage = getFormMessage(
+      formNode,
+      "warning",
+      "Request received and saved. Email notification is not configured yet."
+    );
+    const successMessage = getFormMessage(
+      formNode,
+      "success",
+      "Thanks. I received your request and will reply soon."
+    );
+    const errorMessage = getFormMessage(
+      formNode,
+      "error",
+      "Could not submit right now. Please email me at sbravatti.nelson@gmail.com."
+    );
 
     if (
       !leadData.name ||
@@ -133,11 +164,7 @@ leadForms.forEach((formNode) => {
       !leadData.message ||
       !leadData.consent
     ) {
-      setFormStatus(
-        formNode,
-        "Please fill in all required fields and accept the consent checkbox.",
-        "error"
-      );
+      setFormStatus(formNode, missingMessage, "error");
       return;
     }
 
@@ -145,26 +172,18 @@ leadForms.forEach((formNode) => {
       if (submitBtn) {
         submitBtn.disabled = true;
       }
-      setFormStatus(formNode, "Sending...", "");
+      setFormStatus(formNode, sendingMessage, "");
 
       const submitResult = await submitLeadToDatabase(leadData);
 
       formNode.reset();
       if (submitResult.emailSent === false) {
-        setFormStatus(
-          formNode,
-          "Request received and saved. Email notification is not configured yet.",
-          "warning"
-        );
+        setFormStatus(formNode, warningMessage, "warning");
       } else {
-        setFormStatus(formNode, "Thanks. I received your request and will reply soon.", "success");
+        setFormStatus(formNode, successMessage, "success");
       }
     } catch (error) {
-      setFormStatus(
-        formNode,
-        "Could not submit right now. Please email me at sbravatti.nelson@gmail.com.",
-        "error"
-      );
+      setFormStatus(formNode, errorMessage, "error");
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
