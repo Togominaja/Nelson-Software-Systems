@@ -203,29 +203,49 @@ h1 {
 
 .logo-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
 }
 
 .logo-item {
   margin: 0;
-  min-height: 76px;
+  min-height: 112px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(9, 14, 26, 0.74);
-  padding: 0.5rem;
+  border: 1px solid #d8e1f2;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fc 100%);
+  box-shadow: 0 12px 24px rgba(6, 15, 36, 0.2);
+  padding: 0.75rem 1rem;
 }
 
-.logo-item img {
+.logo-item a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-image {
   display: block;
   max-width: 100%;
-  max-height: 42px;
   width: auto;
   height: auto;
-  opacity: 0.88;
+  opacity: 1;
+}
+
+.logo-image--vsb {
+  max-height: 54px;
+}
+
+.logo-image--supermercado {
+  max-height: 70px;
+}
+
+.logo-image--5g {
+  max-height: 86px;
 }
 
 .btn {
@@ -624,6 +644,18 @@ h1 {
 
   .logo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .logo-item {
+    min-height: 98px;
+  }
+
+  .logo-image--supermercado {
+    max-height: 62px;
+  }
+
+  .logo-image--5g {
+    max-height: 76px;
   }
 
   .site-header {
