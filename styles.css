@@ -476,11 +476,11 @@ h1 {
 
 .process-section {
   margin: 1.4rem 0;
-  background: linear-gradient(160deg, rgba(10, 17, 32, 0.76) 0%, rgba(8, 13, 25, 0.9) 100%);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.2rem 0;
 }
 
 .process-head {
@@ -655,8 +655,7 @@ h1 {
 }
 
 .panel.section-flash,
-.services-section.section-flash,
-.process-section.section-flash {
+.services-section.section-flash {
   outline: 2px solid transparent;
   outline-offset: 4px;
   animation: sectionFlash 1.2s ease;
