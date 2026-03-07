@@ -221,7 +221,10 @@ h1 {
 
 .logo-item img {
   display: block;
-  width: min(100%, 180px);
+  max-width: 100%;
+  max-height: 42px;
+  width: auto;
+  height: auto;
   opacity: 0.88;
 }
 
