@@ -169,10 +169,13 @@ main,
 }
 
 .lang-switch .lang-flag {
-  display: inline-block;
-  margin-right: 0.26rem;
-  font-size: 0.95em;
-  line-height: 1;
+  width: 0.95rem;
+  height: 0.68rem;
+  object-fit: cover;
+  border-radius: 2px;
+  margin-right: 0.32rem;
+  box-shadow: 0 0 0 1px rgba(12, 20, 40, 0.22);
+  flex: 0 0 auto;
 }
 
 .lang-switch a:hover {
