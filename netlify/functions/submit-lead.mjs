@@ -36,14 +36,16 @@ function cleanErrorText(value, maxLength = 220) {
 
 async function sendLeadNotification({ name, email, phone, company, message, page }) {
   const smtpUser = envValue("SMTP_USER");
-  const smtpPass = envValue("SMTP_PASS");
-  if (!smtpUser || !smtpPass) {
+  const smtpPassRaw = envValue("SMTP_PASS");
+  if (!smtpUser || !smtpPassRaw) {
     return { emailSent: false, emailError: "email_not_configured" };
   }
 
   const smtpHost = envValue("SMTP_HOST", "smtp.gmail.com");
   const smtpPort = Number(envValue("SMTP_PORT", "465"));
   const smtpSecure = envValue("SMTP_SECURE", smtpPort === 465 ? "true" : "false") !== "false";
+  const isGmailSmtp = /gmail/i.test(smtpHost) || /@gmail\.com$/i.test(smtpUser);
+  const smtpPass = isGmailSmtp ? smtpPassRaw.replace(/\s+/g, "") : smtpPassRaw;
   const notifyTo = envValue("NOTIFY_TO", smtpUser);
   const notifyFrom = envValue("NOTIFY_FROM", smtpUser);
 
