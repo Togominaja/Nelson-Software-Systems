@@ -26,6 +26,14 @@ function envValue(name, fallback = "") {
   return typeof value === "string" && value.length > 0 ? value : fallback;
 }
 
+function cleanErrorText(value, maxLength = 220) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
 async function sendLeadNotification({ name, email, phone, company, message, page }) {
   const smtpUser = envValue("SMTP_USER");
   const smtpPass = envValue("SMTP_PASS");
@@ -74,8 +82,26 @@ async function sendLeadNotification({ name, email, phone, company, message, page
     });
     return { emailSent: true };
   } catch (error) {
-    console.error("lead email send error", error);
-    return { emailSent: false, emailError: "email_send_failed" };
+    const errorCode = cleanErrorText(String(error?.code || ""), 80);
+    const responseCode =
+      typeof error?.responseCode === "number" ? error.responseCode : null;
+    const command = cleanErrorText(String(error?.command || ""), 120);
+    const detail = cleanErrorText(String(error?.message || ""));
+
+    console.error("lead email send error", {
+      code: errorCode || null,
+      responseCode,
+      command: command || null,
+      detail: detail || null,
+    });
+
+    return {
+      emailSent: false,
+      emailError: "email_send_failed",
+      emailErrorCode: errorCode || null,
+      emailResponseCode: responseCode,
+      emailErrorDetail: detail || null,
+    };
   }
 }
 
