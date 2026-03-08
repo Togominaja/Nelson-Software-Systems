@@ -76,7 +76,15 @@ async function sendLeadNotification({ name, email, phone, company, message, page
     ["NOTIFY_TO", "LEADS_NOTIFY_TO", "CONTACT_NOTIFY_TO"],
     smtpUser
   );
-  const notifyFrom = envValueAny(["NOTIFY_FROM", "LEADS_NOTIFY_FROM"], smtpUser);
+  const notifyFromRaw = envValueAny(["NOTIFY_FROM", "LEADS_NOTIFY_FROM"], smtpUser);
+  const notifyFromName = envValueAny(
+    ["NOTIFY_FROM_NAME", "LEADS_NOTIFY_FROM_NAME"],
+    "Nelson Software Systems"
+  );
+  const notifyFrom = isGmailSmtp ? smtpUser : notifyFromRaw;
+  const fromHeader = notifyFromName
+    ? `"${notifyFromName}" <${notifyFrom}>`
+    : notifyFrom;
 
   const transporter = nodemailer.createTransport({
     host: smtpHost,
@@ -106,7 +114,7 @@ async function sendLeadNotification({ name, email, phone, company, message, page
   try {
     await transporter.sendMail({
       to: notifyTo,
-      from: notifyFrom,
+      from: fromHeader,
       replyTo: email,
       subject,
       text,
