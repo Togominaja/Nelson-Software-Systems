@@ -26,6 +26,17 @@ function envValue(name, fallback = "") {
   return typeof value === "string" && value.length > 0 ? value : fallback;
 }
 
+function envValueAny(names, fallback = "") {
+  for (const name of names) {
+    const value = envValue(name);
+    if (value) {
+      return value;
+    }
+  }
+
+  return fallback;
+}
+
 function cleanErrorText(value, maxLength = 220) {
   if (typeof value !== "string") {
     return "";
@@ -35,19 +46,37 @@ function cleanErrorText(value, maxLength = 220) {
 }
 
 async function sendLeadNotification({ name, email, phone, company, message, page }) {
-  const smtpUser = envValue("SMTP_USER");
-  const smtpPassRaw = envValue("SMTP_PASS");
+  const smtpUser = envValueAny([
+    "SMTP_USER",
+    "GMAIL_USER",
+    "EMAIL_USER",
+    "MAIL_USER",
+  ]);
+  const smtpPassRaw = envValueAny([
+    "SMTP_PASS",
+    "SMTP_PASSWORD",
+    "GMAIL_APP_PASSWORD",
+    "GMAIL_APP_PASS",
+    "EMAIL_PASS",
+    "MAIL_PASS",
+  ]);
   if (!smtpUser || !smtpPassRaw) {
     return { emailSent: false, emailError: "email_not_configured" };
   }
 
-  const smtpHost = envValue("SMTP_HOST", "smtp.gmail.com");
-  const smtpPort = Number(envValue("SMTP_PORT", "465"));
+  const smtpHost = envValueAny(["SMTP_HOST", "MAIL_HOST"], "smtp.gmail.com");
+  const smtpPort = Number(envValueAny(["SMTP_PORT", "MAIL_PORT"], "465"));
+  if (!Number.isFinite(smtpPort) || smtpPort <= 0) {
+    return { emailSent: false, emailError: "invalid_smtp_port" };
+  }
   const smtpSecure = envValue("SMTP_SECURE", smtpPort === 465 ? "true" : "false") !== "false";
   const isGmailSmtp = /gmail/i.test(smtpHost) || /@gmail\.com$/i.test(smtpUser);
   const smtpPass = isGmailSmtp ? smtpPassRaw.replace(/\s+/g, "") : smtpPassRaw;
-  const notifyTo = envValue("NOTIFY_TO", smtpUser);
-  const notifyFrom = envValue("NOTIFY_FROM", smtpUser);
+  const notifyTo = envValueAny(
+    ["NOTIFY_TO", "LEADS_NOTIFY_TO", "CONTACT_NOTIFY_TO"],
+    smtpUser
+  );
+  const notifyFrom = envValueAny(["NOTIFY_FROM", "LEADS_NOTIFY_FROM"], smtpUser);
 
   const transporter = nodemailer.createTransport({
     host: smtpHost,

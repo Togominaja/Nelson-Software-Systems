@@ -146,6 +146,11 @@ leadForms.forEach((formNode) => {
       "warning",
       "Request received and saved. Email notification is not configured yet."
     );
+    const emailFailedMessage = getFormMessage(
+      formNode,
+      "email-failed",
+      "Request received and saved, but email notification failed. Please email me directly at sbravatti.nelson@gmail.com."
+    );
     const successMessage = getFormMessage(
       formNode,
       "success",
@@ -178,7 +183,11 @@ leadForms.forEach((formNode) => {
 
       formNode.reset();
       if (submitResult.emailSent === false) {
-        setFormStatus(formNode, warningMessage, "warning");
+        if (submitResult.emailError === "email_not_configured") {
+          setFormStatus(formNode, warningMessage, "warning");
+        } else {
+          setFormStatus(formNode, emailFailedMessage, "warning");
+        }
       } else {
         setFormStatus(formNode, successMessage, "success");
       }
