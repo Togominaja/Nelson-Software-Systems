@@ -79,7 +79,7 @@ async function sendLeadNotification({ name, email, phone, company, message, page
   const notifyFromRaw = envValueAny(["NOTIFY_FROM", "LEADS_NOTIFY_FROM"], smtpUser);
   const notifyFromName = envValueAny(
     ["NOTIFY_FROM_NAME", "LEADS_NOTIFY_FROM_NAME"],
-    "TurboTurtle"
+    "TurboTurtle Software Systems"
   );
   const notifyFrom = isGmailSmtp ? smtpUser : notifyFromRaw;
   const fromHeader = notifyFromName
