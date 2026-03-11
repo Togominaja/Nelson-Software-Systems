@@ -113,22 +113,11 @@ main,
 }
 
 .brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
   color: var(--text);
   text-decoration: none;
   font-family: "Sora", sans-serif;
   font-size: 1.18rem;
-  font-weight: 700;
   letter-spacing: 0.02em;
-}
-
-.brand-logo {
-  width: 1.45rem;
-  height: 1.45rem;
-  border-radius: 0.35rem;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 18px rgba(10, 18, 35, 0.4);
 }
 
 .site-header nav {
