@@ -195,6 +195,16 @@ main {
   padding: 2.45rem 0;
 }
 
+.hero-logo {
+  display: block;
+  width: clamp(170px, 27vw, 260px);
+  max-width: 100%;
+  height: auto;
+  margin: 0 0 1rem;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.38))
+    drop-shadow(0 0 18px rgba(198, 205, 220, 0.16));
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.16em;
