@@ -222,8 +222,8 @@ main {
 
 .hero-mark {
   display: block;
-  width: min(100%, 110px);
-  max-height: 140px;
+  width: min(100%, 150px);
+  max-height: 190px;
   height: auto;
   opacity: 0.96;
   filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.36))
@@ -792,7 +792,7 @@ h1 {
   }
 
   .hero-mark {
-    width: min(100%, 98px);
+    width: min(100%, 128px);
   }
 
   .about-layout {
@@ -866,7 +866,7 @@ h1 {
   }
 
   .hero-mark {
-    width: min(100%, 80px);
+    width: min(100%, 104px);
   }
 
   .logo-grid {
