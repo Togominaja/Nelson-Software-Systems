@@ -200,7 +200,7 @@ main {
 .hero-home {
   max-width: none;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
   align-items: center;
   gap: clamp(2rem, 5vw, 4.5rem);
 }
@@ -211,15 +211,17 @@ main {
 
 .hero-visual {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   min-height: 100%;
+  padding-right: clamp(0rem, 1vw, 0.75rem);
   pointer-events: none;
 }
 
 .hero-mark {
   display: block;
-  width: min(100%, 340px);
+  width: min(100%, 290px);
+  max-height: 360px;
   height: auto;
   opacity: 0.96;
   filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.36))
